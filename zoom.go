@@ -1,28 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/gorilla/mux"
+	"github.com/kevinjqiu/zoom/api"
 )
 
 const VERSION = "0.1.0"
 
 func actionServe(c *cli.Context) {
-	port := c.String("port")
+	host := c.String("host")
+	port := c.Int("port")
 
-	r := mux.NewRouter()
-	http.Handle("/", r)
-	r.HandleFunc("/getcountry", func(rw http.ResponseWriter, r *http.Request) {
-		println(r)
-	})
-	log.Printf("Serving Zoom at :%s", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
-	log.Printf("Finished")
+	server := api.ZoomApi{
+		Host: host,
+		Port: port,
+	}
+
+	server.Serve()
 }
 
 func actionUpdate(c *cli.Context) {
@@ -39,7 +35,8 @@ func main() {
 			Usage:  "Start zoom server",
 			Action: actionServe,
 			Flags: []cli.Flag{
-				cli.StringFlag{"port", "5656", "Port"},
+				cli.IntFlag{"port", 5656, "Port"},
+				cli.StringFlag{"host", "", "Host"},
 			},
 		},
 		{
