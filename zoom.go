@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/kevinjqiu/zoom/api"
+	"github.com/kevinjqiu/zoom/db"
 )
 
 const VERSION = "0.1.0"
@@ -46,6 +48,13 @@ func main() {
 			Name:   "update",
 			Usage:  "Update GeoLite2 database",
 			Action: actionUpdate,
+		},
+		{
+			Name: "test",
+			Action: func(c *cli.Context) {
+				db.Locations()
+				fmt.Println(db.Blocks())
+			},
 		},
 	}
 

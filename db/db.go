@@ -15,13 +15,13 @@ type Location struct {
 
 type Block struct {
 	NetworkStartIp              string
-	NetworkPrefixLength         int
+	NetworkPrefixLength         string
 	GeonameId                   string
 	RegisteredCountryGeoNameId  string
 	RepresentedCountryGeoNameId string
 	PostalCode                  string
 	Latitude                    string
 	Longitude                   string
-	IsAnonymousProxy            bool
-	IsSatelliteProvider         bool
+	IsAnonymousProxy            string
+	IsSatelliteProvider         string
 }
