@@ -8,11 +8,11 @@ import (
 )
 
 type CsvDataProvider struct {
-	locations []interface{}
-	blocks    []interface{}
+	locations []Location
+	blocks    []Block
 }
 
-func newBlockFromRecord(record []string) interface{} {
+func newBlockFromRecord(record []string) Block {
 	return Block{
 		NetworkStartIp:              record[0],
 		NetworkPrefixLength:         record[1],
@@ -27,7 +27,7 @@ func newBlockFromRecord(record []string) interface{} {
 	}
 }
 
-func newLocationFromRecord(record []string) interface{} {
+func newLocationFromRecord(record []string) Location {
 	return Location{
 		GeonameId:          record[0],
 		ContinentCode:      record[1],
@@ -42,8 +42,8 @@ func newLocationFromRecord(record []string) interface{} {
 	}
 }
 
-func forEachRecord(fileName string, transformer func(record []string) interface{}) []interface{} {
-	var result []interface{}
+func loadBlocks(fileName string) []Block {
+	var result []Block
 	file, _ := os.Open(fileName)
 	defer file.Close()
 
@@ -58,8 +58,29 @@ func forEachRecord(fileName string, transformer func(record []string) interface{
 		} else if err != nil {
 			panic(err)
 		}
-		transformedResult := transformer(record)
-		result = append(result, transformedResult)
+		result = append(result, newBlockFromRecord(record))
+	}
+
+	return result
+}
+
+func loadLocations(fileName string) []Location {
+	var result []Location
+	file, _ := os.Open(fileName)
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+
+	reader.Read()
+
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			panic(err)
+		}
+		result = append(result, newLocationFromRecord(record))
 	}
 
 	return result
@@ -68,9 +89,9 @@ func forEachRecord(fileName string, transformer func(record []string) interface{
 func NewCsvDataProvider(dataFolderName string) *CsvDataProvider {
 	result := CsvDataProvider{}
 	blockFilePath := fmt.Sprintf("%s/GeoLite2-Country-Blocks.csv", dataFolderName)
-	result.blocks = forEachRecord(blockFilePath, newBlockFromRecord).([]Block)
+	result.blocks = loadBlocks(blockFilePath)
 
 	locationFilePath := fmt.Sprintf("%s/GeoLite2-Country-Locations.csv", dataFolderName)
-	result.locations = forEachRecord(locationFilePath, newLocationFromRecord)
+	result.locations = loadLocations(locationFilePath)
 	return &result
 }
