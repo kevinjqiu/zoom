@@ -52,8 +52,10 @@ func main() {
 		{
 			Name: "test",
 			Action: func(c *cli.Context) {
-				db.Locations()
-				fmt.Println(db.Blocks())
+				provider := db.NewCsvDataProvider("_data")
+				fmt.Println(provider)
+				// db.Locations()
+				// fmt.Println(db.Blocks())
 			},
 		},
 	}

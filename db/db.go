@@ -22,6 +22,6 @@ type Block struct {
 	PostalCode                  string
 	Latitude                    string
 	Longitude                   string
-	IsAnonymousProxy            string
-	IsSatelliteProvider         string
+	IsAnonymousProxy            bool
+	IsSatelliteProvider         bool
 }
