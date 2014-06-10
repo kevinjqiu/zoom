@@ -24,6 +24,9 @@ func actionServe(c *cli.Context) {
 func actionUpdate(c *cli.Context) {
 }
 
+const DEFAULT_PORT = 5656
+const DEFAULT_ADDR = "127.0.0.1"
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "zoom"
@@ -35,8 +38,8 @@ func main() {
 			Usage:  "Start zoom server",
 			Action: actionServe,
 			Flags: []cli.Flag{
-				cli.IntFlag{"port", 5656, "Port"},
-				cli.StringFlag{"host", "", "Host"},
+				cli.IntFlag{"port", DEFAULT_PORT, "Port"},
+				cli.StringFlag{"host", DEFAULT_ADDR, "Host"},
 			},
 		},
 		{

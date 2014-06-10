@@ -16,11 +16,11 @@ type ZoomApi struct {
 func (api *ZoomApi) Serve() {
 	r := mux.NewRouter()
 	http.Handle("/", r)
-	r.HandleFunc("/getcountry", func(rw http.ResponseWriter, r *http.Request) {
-		println(r)
+	r.HandleFunc("/geo/{ip}", func(rw http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		println(vars["ip"])
 	})
 	bindAddr := fmt.Sprintf("%s:%d", api.Host, api.Port)
 	log.Printf("Serving Zoom at %s", bindAddr)
-	http.ListenAndServe(bindAddr, nil)
-	log.Printf("Finished")
+	log.Fatalf("%s", http.ListenAndServe(bindAddr, nil))
 }
