@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/kevinjqiu/zoom/api"
-	"github.com/kevinjqiu/zoom/db"
 )
 
 const VERSION = "0.1.0"
@@ -48,18 +46,6 @@ func main() {
 			Name:   "update",
 			Usage:  "Update GeoLite2 database",
 			Action: actionUpdate,
-		},
-		{
-			Name: "test",
-			Action: func(c *cli.Context) {
-				provider := db.NewCsvDataProvider("_data")
-				// ip := net.ParseIP("::ffff:223.255.252.121").To16()
-				block := provider.GetBlockByIP("::ffff:223.255.252.121")
-				fmt.Printf("%s\n", block)
-				fmt.Printf("%s\n", block.GeonameId)
-				location := provider.GetLocationByGeonameId(block.GeonameId)
-				fmt.Printf("%s\n", location)
-			},
 		},
 	}
 
