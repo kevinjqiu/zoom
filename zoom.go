@@ -53,9 +53,12 @@ func main() {
 			Name: "test",
 			Action: func(c *cli.Context) {
 				provider := db.NewCsvDataProvider("_data")
-				fmt.Println(provider)
-				// db.Locations()
-				// fmt.Println(db.Blocks())
+				// ip := net.ParseIP("::ffff:223.255.252.121").To16()
+				block := provider.GetBlockByIP("::ffff:223.255.252.121")
+				fmt.Printf("%s\n", block)
+				fmt.Printf("%s\n", block.GeonameId)
+				location := provider.GetLocationByGeonameId(block.GeonameId)
+				fmt.Printf("%s\n", location)
 			},
 		},
 	}

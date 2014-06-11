@@ -1,5 +1,7 @@
 package db
 
+import "net"
+
 type Location struct {
 	GeonameId          string
 	ContinentCode      string
@@ -14,8 +16,8 @@ type Location struct {
 }
 
 type Block struct {
-	NetworkStartIp              string
-	NetworkPrefixLength         string
+	NetworkStartIp              net.IP
+	NetworkPrefixLength         int
 	GeonameId                   string
 	RegisteredCountryGeoNameId  string
 	RepresentedCountryGeoNameId string
@@ -24,4 +26,16 @@ type Block struct {
 	Longitude                   string
 	IsAnonymousProxy            bool
 	IsSatelliteProvider         bool
+}
+
+func (this *Block) NetworkEndIp() net.IP {
+	ip := this.NetworkStartIp.To16()
+	mask := net.CIDRMask(this.NetworkPrefixLength, 128)
+
+	endIp := net.IP(make([]byte, 16, 16))
+	for i, _ := range mask {
+		endIp[i] = ip[i] | ^mask[i]
+	}
+
+	return net.IP(endIp)
 }

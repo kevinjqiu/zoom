@@ -1,10 +1,13 @@
 package db
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"io"
+	"net"
 	"os"
+	"strconv"
 )
 
 type CsvDataProvider struct {
@@ -13,9 +16,13 @@ type CsvDataProvider struct {
 }
 
 func newBlockFromRecord(record []string) Block {
+	prefixLength, err := strconv.Atoi(record[1])
+	if err != nil {
+		panic(err)
+	}
 	return Block{
-		NetworkStartIp:              record[0],
-		NetworkPrefixLength:         record[1],
+		NetworkStartIp:              net.ParseIP(record[0]),
+		NetworkPrefixLength:         prefixLength,
 		GeonameId:                   record[2],
 		RegisteredCountryGeoNameId:  record[3],
 		RepresentedCountryGeoNameId: record[4],
@@ -79,7 +86,7 @@ func loadLocations(fileName string) map[string]Location {
 	reader := csv.NewReader(file)
 	reader.Read() // discard the header
 
-	var result map[string]Location
+	result := map[string]Location{}
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
@@ -105,9 +112,31 @@ func NewCsvDataProvider(dataFolderName string) *CsvDataProvider {
 }
 
 func (this *CsvDataProvider) GetLocationByGeonameId(geonameid string) Location {
-	return Location{}
+	return this.locations[geonameid]
+}
+
+func IpCmp(ip1, ip2 net.IP) byte {
+	for i, _ := range ip1 {
+		if ip1[i] == ip2[i] {
+			continue
+		} else {
+			return ip1[i] - ip2[i]
+		}
+	}
+	return 0
 }
 
 func (this *CsvDataProvider) GetBlockByIP(ipaddr string) Block {
+	// naive implementation for now
+	target := net.ParseIP(ipaddr).To16()
+
+	for _, block := range this.blocks {
+		if bytes.Compare(block.NetworkStartIp, target) < 0 {
+			networkEndIp := block.NetworkEndIp()
+			if bytes.Compare(target, networkEndIp) < 0 {
+				return block
+			}
+		}
+	}
 	return Block{}
 }
