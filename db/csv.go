@@ -115,17 +115,6 @@ func (this *CsvDataProvider) GetLocationByGeonameId(geonameid string) Location {
 	return this.locations[geonameid]
 }
 
-func IpCmp(ip1, ip2 net.IP) byte {
-	for i, _ := range ip1 {
-		if ip1[i] == ip2[i] {
-			continue
-		} else {
-			return ip1[i] - ip2[i]
-		}
-	}
-	return 0
-}
-
 func (this *CsvDataProvider) GetBlockByIP(ipaddr string) Block {
 	// naive implementation for now
 	target := net.ParseIP(ipaddr).To16()
