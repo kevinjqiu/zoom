@@ -115,9 +115,9 @@ func (this *CsvDataProvider) GetLocationByGeonameId(geonameid string) Location {
 	return this.locations[geonameid]
 }
 
-func (this *CsvDataProvider) GetBlockByIP(ipaddr string) Block {
+func (this *CsvDataProvider) GetBlockByIP(ipaddr net.IP) Block {
 	// naive implementation for now
-	target := net.ParseIP(ipaddr).To16()
+	target := ipaddr.To16()
 
 	for _, block := range this.blocks {
 		if bytes.Compare(block.NetworkStartIp, target) < 0 {

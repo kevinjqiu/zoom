@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,33 +16,50 @@ type ZoomApi struct {
 	Port int
 }
 
-func (api *ZoomApi) Serve() {
-	provider := db.NewCsvDataProvider("_data")
-
-	r := mux.NewRouter()
-	http.Handle("/", r)
-	r.HandleFunc("/geo/{ip}", func(rw http.ResponseWriter, r *http.Request) {
+func jsonResponder(handler func(map[string]string) (int, interface{})) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		ip := vars["ip"]
-		block := provider.GetBlockByIP(ip)
-		location := provider.GetLocationByGeonameId(block.GeonameId)
-		geo := Geo{}
-		geo.Ip = ip
-		geo.Location = Location{
-			CountryName:    location.CountryName,
-			CountryISOCode: location.CountryISOCode,
-		}
+		statusCode, result := handler(vars)
 
-		result, err := json.MarshalIndent(geo, "", "    ")
+		jsonResponse, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
 			http.Error(rw, err.Error(), 500)
 			return
 		}
 
 		rw.Header().Set("Content-Type", "application/json")
-		rw.WriteHeader(200)
-		rw.Write(result)
-	})
+		rw.WriteHeader(statusCode)
+		rw.Write(jsonResponse)
+	}
+}
+
+func (api *ZoomApi) Serve() {
+	provider := db.NewCsvDataProvider("_data")
+
+	r := mux.NewRouter()
+	r.HandleFunc("/geo/{ip}", jsonResponder(func(vars map[string]string) (int, interface{}) {
+		log.Printf("geoip requested: %s", vars["ip"])
+		ip := net.ParseIP(vars["ip"])
+		if ip == nil {
+			return 400, Error{fmt.Sprintf("%q is not a valid IP address", vars["ip"])}
+		}
+
+		block := provider.GetBlockByIP(ip)
+		location := provider.GetLocationByGeonameId(block.GeonameId)
+
+		geo := Geo{
+			Ip: ip,
+			Location: Location{
+				CountryName:    location.CountryName,
+				CountryISOCode: location.CountryISOCode,
+			},
+		}
+
+		return 200, geo
+	}))
+
+	http.Handle("/", r)
+
 	bindAddr := fmt.Sprintf("%s:%d", api.Host, api.Port)
 	log.Printf("Serving Zoom at %s", bindAddr)
 	log.Fatalf("%s", http.ListenAndServe(bindAddr, nil))
