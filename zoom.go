@@ -24,6 +24,9 @@ func actionServe(c *cli.Context) {
 func actionUpdate(c *cli.Context) {
 }
 
+func actionQuery(c *cli.Context) {
+}
+
 const DEFAULT_PORT = 5656
 const DEFAULT_ADDR = "127.0.0.1"
 
@@ -46,6 +49,11 @@ func main() {
 			Name:   "update",
 			Usage:  "Update GeoLite2 database",
 			Action: actionUpdate,
+		},
+		{
+			Name:   "query",
+			Usage:  "Query the geolocation of an IP",
+			Action: actionQuery,
 		},
 	}
 
