@@ -8,7 +8,7 @@ import (
 )
 
 type CsvDataProvider struct {
-	locations []Location
+	locations map[string]Location
 	blocks    []Block
 }
 
@@ -25,6 +25,14 @@ func newBlockFromRecord(record []string) Block {
 		IsAnonymousProxy:            record[8] != "0",
 		IsSatelliteProvider:         record[9] != "0",
 	}
+}
+
+func newCsvReader(fileName string) *csv.Reader {
+	file, _ := os.Open(fileName)
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	return reader
 }
 
 func newLocationFromRecord(record []string) Location {
@@ -49,7 +57,7 @@ func loadBlocks(fileName string) []Block {
 
 	reader := csv.NewReader(file)
 
-	reader.Read()
+	reader.Read() // discard the header
 
 	for {
 		record, err := reader.Read()
@@ -64,15 +72,14 @@ func loadBlocks(fileName string) []Block {
 	return result
 }
 
-func loadLocations(fileName string) []Location {
-	var result []Location
+func loadLocations(fileName string) map[string]Location {
 	file, _ := os.Open(fileName)
 	defer file.Close()
 
 	reader := csv.NewReader(file)
+	reader.Read() // discard the header
 
-	reader.Read()
-
+	var result map[string]Location
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
@@ -80,7 +87,8 @@ func loadLocations(fileName string) []Location {
 		} else if err != nil {
 			panic(err)
 		}
-		result = append(result, newLocationFromRecord(record))
+		location := newLocationFromRecord(record)
+		result[location.GeonameId] = location
 	}
 
 	return result
@@ -94,4 +102,12 @@ func NewCsvDataProvider(dataFolderName string) *CsvDataProvider {
 	locationFilePath := fmt.Sprintf("%s/GeoLite2-Country-Locations.csv", dataFolderName)
 	result.locations = loadLocations(locationFilePath)
 	return &result
+}
+
+func (this *CsvDataProvider) GetLocationByGeonameId(geonameid string) Location {
+	return Location{}
+}
+
+func (this *CsvDataProvider) GetBlockByIP(ipaddr string) Block {
+	return Block{}
 }
