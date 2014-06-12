@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/kevinjqiu/zoom/api"
 )
 
 const VERSION = "0.1.0"
@@ -13,7 +12,7 @@ func actionServe(c *cli.Context) {
 	host := c.String("host")
 	port := c.Int("port")
 
-	server := api.ZoomApi{
+	server := ZoomApi{
 		Host: host,
 		Port: port,
 	}

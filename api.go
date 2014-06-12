@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"encoding/json"
@@ -10,6 +10,20 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kevinjqiu/zoom/db"
 )
+
+type Location struct {
+	CountryName    string `json:"country_name"`
+	CountryISOCode string `json:"country_iso_code"`
+}
+
+type Geo struct {
+	Ip       net.IP   `json:"ip"`
+	Location Location `json:"location"`
+}
+
+type Error struct {
+	Message string `json:"message"`
+}
 
 type ZoomApi struct {
 	Host string
