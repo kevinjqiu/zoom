@@ -2,6 +2,11 @@ package db
 
 import "net"
 
+type ZoomDataProvider interface {
+	GetLocationByGeonameId(string) Location
+	GetBlockByIP(net.IP) Block
+}
+
 type Location struct {
 	GeonameId          string
 	ContinentCode      string
