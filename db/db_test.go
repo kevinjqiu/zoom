@@ -29,11 +29,20 @@ var _ = Describe("Block", func() {
 		Expect(block.IsSatelliteProvider).To(Equal(false))
 	})
 
-	It("Has the correct network end ip", func() {
+	It("Has the correct network end ipv4 networks", func() {
 		block := Block{
 			NetworkStartIp:      net.ParseIP("::ffff:223.255.252.0"),
 			NetworkPrefixLength: 119,
 		}
 		Expect(block.NetworkEndIp()).To(Equal(net.ParseIP("::ffff:223.255.253.255")))
+	})
+
+	It("Has the correct network end ip for ipv6 networks", func() {
+		block := Block{
+			NetworkStartIp:      net.ParseIP("2a03:e0c0::"),
+			NetworkPrefixLength: 32,
+		}
+		Expect(block.NetworkEndIp()).To(Equal(net.ParseIP(
+			"2a03:e0c0:ffff:ffff:ffff:ffff:ffff:ffff")))
 	})
 })
