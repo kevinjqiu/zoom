@@ -1,7 +1,6 @@
-package main
+package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -28,23 +27,6 @@ type Error struct {
 type ZoomApi struct {
 	Host string
 	Port int
-}
-
-func jsonResponder(handler func(map[string]string) (int, interface{})) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		statusCode, result := handler(vars)
-
-		jsonResponse, err := json.MarshalIndent(result, "", "    ")
-		if err != nil {
-			http.Error(rw, err.Error(), 500)
-			return
-		}
-
-		rw.Header().Set("Content-Type", "application/json")
-		rw.WriteHeader(statusCode)
-		rw.Write(jsonResponse)
-	}
 }
 
 func (api *ZoomApi) Serve() {
