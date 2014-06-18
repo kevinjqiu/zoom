@@ -25,13 +25,12 @@ type Error struct {
 }
 
 type ZoomApi struct {
-	Host string
-	Port int
+	Host         string
+	Port         int
+	DataProvider db.ZoomDataProvider
 }
 
 func (api *ZoomApi) Serve() {
-	provider := db.NewCsvDataProvider("_data")
-
 	r := mux.NewRouter()
 	r.HandleFunc("/geo/{ip}", jsonResponder(func(vars map[string]string) (int, interface{}) {
 		log.Printf("geoip requested: %s", vars["ip"])
@@ -40,8 +39,8 @@ func (api *ZoomApi) Serve() {
 			return 400, Error{fmt.Sprintf("%q is not a valid IP address", vars["ip"])}
 		}
 
-		block := provider.GetBlockByIP(ip)
-		location := provider.GetLocationByGeonameId(block.GeonameId)
+		block := api.DataProvider.GetBlockByIP(ip)
+		location := api.DataProvider.GetLocationByGeonameId(block.GeonameId)
 
 		geo := Geo{
 			Ip: ip,

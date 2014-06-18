@@ -15,8 +15,9 @@ func actionServe(c *cli.Context) {
 	port := c.Int("port")
 
 	server := api.ZoomApi{
-		Host: host,
-		Port: port,
+		Host:         host,
+		Port:         port,
+		DataProvider: db.NewCsvDataProvider("_data"),
 	}
 
 	server.Serve()
