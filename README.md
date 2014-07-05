@@ -9,6 +9,7 @@ _|"""""|_|"""""|_|"""""|_|"""""|
 
 A GeoLocation web service using maxmind.com geoip database
 
+[![Build Status](https://travis-ci.org/kevinjqiu/zoom.svg?branch=master)](https://travis-ci.org/kevinjqiu/zoom)
 
 Command Line Interface
 ----------------------
