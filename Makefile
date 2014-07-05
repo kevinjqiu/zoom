@@ -9,3 +9,5 @@ get-deps:
 	go get github.com/gorilla/mux
 	go get github.com/onsi/ginkgo
 	go get github.com/onsi/gomega
+script:
+	go test -v ./...
